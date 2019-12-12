@@ -1,6 +1,9 @@
 package com.example.springbootrest.enitities;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -10,9 +13,11 @@ public class User {
     @GeneratedValue
     private Long id;
 
+    @NotEmpty(message = "Username is mandatory field. Please provide username")
     @Column(name = "USER_NAME", length = 50, nullable = false, unique = true)
     private String username;
 
+    @Size(min = 2, message = "FirstName should atleast 2 characters")
     @Column(name = "FIRST_NAME", length = 50, nullable = false)
     private String firstName;
 
@@ -27,6 +32,9 @@ public class User {
 
     @Column(name = "SSN", length = 50, nullable = false, unique = true)
     private String ssn;
+
+    @OneToMany(mappedBy = "user")
+    private List<Order> orders;
 
     public User() {
     }
@@ -85,5 +93,13 @@ public class User {
 
     public void setSsn(String ssn) {
         this.ssn = ssn;
+    }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
     }
 }

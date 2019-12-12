@@ -1,10 +1,14 @@
 package com.example.springbootrest.sevices;
 
 import com.example.springbootrest.enitities.User;
+import com.example.springbootrest.exceptions.UserExistException;
+import com.example.springbootrest.exceptions.UserNotFoundException;
 import com.example.springbootrest.repositories.UserReporisotry;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,24 +29,41 @@ public class UserServiceImpl  implements UserService{
     }
 
     @Override
-    public User createUser(User user) {
+    public User createUser(User user) throws UserExistException {
+
+        User existUser = userReporisotry.findByUsername(user.getUsername());
+
+        if (existUser != null){
+            throw new UserExistException("User with username "+user.getUsername()+" already exist!");
+        }
+
         return userReporisotry.save(user);
     }
 
     @Override
-    public Optional<User> findByUserId(Long id){
-        return userReporisotry.findById(id);
+    public Optional<User> findByUserId(Long id) throws UserNotFoundException {
+        Optional<User> usr = userReporisotry.findById(id);
+        if (!usr.isPresent()){
+            throw new UserNotFoundException("User not found in user repo");
+        }
+
+        return usr;
     }
 
     @Override
     public void deleteUserById(Long id){
-        if (userReporisotry.findById(id).isPresent()){
-            userReporisotry.deleteById(id);
+        if (!userReporisotry.findById(id).isPresent()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found in user repo");
         }
+        userReporisotry.deleteById(id);
     }
 
     @Override
-    public User updateUserById(Long id, User user){
+    public User updateUserById(Long id, User user) throws UserNotFoundException {
+        Optional<User> usr = userReporisotry.findById(id);
+        if (!usr.isPresent()){
+            throw new UserNotFoundException("User not found in user repo, provide the correct user id");
+        }
         user.setId(id);
         return userReporisotry.save(user);
     }
