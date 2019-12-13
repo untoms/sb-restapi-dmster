@@ -5,6 +5,9 @@ import com.example.springbootrest.exceptions.UserExistException;
 import com.example.springbootrest.exceptions.UserNameNotFoundException;
 import com.example.springbootrest.exceptions.UserNotFoundException;
 import com.example.springbootrest.sevices.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,6 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Api(
+        tags = "User Management",
+        value = "UserSvcController"
+)
 @RestController
 @Validated
 @RequestMapping(value = "/users")
@@ -38,11 +45,13 @@ public class UserSvcController {
        if (usr == null){
            throw new UserNameNotFoundException("Usename not found");
        }
+
        return usr;
     }
 
+    @ApiOperation(value = "create new user")
     @PostMapping("/createuser")
-    public ResponseEntity<Void> createUser(@Valid @RequestBody User user, UriComponentsBuilder builder){
+    public ResponseEntity<Void> createUser(@ApiParam("User Information for a new user to be created.")  @Valid @RequestBody User user, UriComponentsBuilder builder){
         try{
             User created = userService.createUser(user);
             HttpHeaders headers = new HttpHeaders();
