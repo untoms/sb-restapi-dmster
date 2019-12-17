@@ -10,7 +10,7 @@ import javax.persistence.*;
 public class Order {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderid;
 
     @JsonView(Views.Internal.class)
@@ -21,6 +21,11 @@ public class Order {
     private User user;
 
     public Order() {
+    }
+
+    public Order(String orderdescription, User user) {
+        this.orderdescription = orderdescription;
+        this.user = user;
     }
 
     public Long getOrderid() {

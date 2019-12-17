@@ -16,5 +16,6 @@ public interface UserService {
     User updateUserById(Long id, User user) throws UserNotFoundException ;
     User updateUsernameById(long id, String username);
     List<User> findByIdIn(List<Long> ids);
+    List<User> findAllUsers();
 
 }

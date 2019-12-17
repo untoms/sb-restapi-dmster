@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -34,9 +35,12 @@ public class UserSvcController {
 
     final private UserService userService;
 
+    final private PasswordEncoder encoder;
+
     @Autowired
-    public UserSvcController(UserService userService) {
+    public UserSvcController(UserService userService,PasswordEncoder encoder) {
         this.userService = userService;
+        this.encoder = encoder;
     }
 
     @GetMapping("/byusername/{username}")
@@ -50,8 +54,10 @@ public class UserSvcController {
     }
 
     @ApiOperation(value = "create new user")
-    @PostMapping("/createuser")
-    public ResponseEntity<Void> createUser(@ApiParam("User Information for a new user to be created.")  @Valid @RequestBody User user, UriComponentsBuilder builder){
+    @PostMapping
+    public ResponseEntity<Void> createUser(
+            @ApiParam("User Information for a new user to be created.")
+            @Valid @RequestBody User user, UriComponentsBuilder builder){
         try{
             User created = userService.createUser(user);
             HttpHeaders headers = new HttpHeaders();
@@ -72,12 +78,12 @@ public class UserSvcController {
         }
     }
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/{id}")
     public void deleteUserById(@PathVariable("id") Long id){
         userService.deleteUserById(id);
     }
 
-    @PutMapping("/users/{id}")
+    @PutMapping("/{id}")
     public User updateUser(@PathVariable("id") Long id, @RequestBody User user){
         try {
             return userService.updateUserById(id, user);
@@ -102,5 +108,25 @@ public class UserSvcController {
 
         return userService.findByIdIn(idsLong);
 
+    }
+
+    @GetMapping
+    public List<User> findAll(){
+        return userService.findAllUsers();
+
+    }
+
+    @PostMapping("/regis")
+    public ResponseEntity<Void> regis(@Valid @RequestBody User user, UriComponentsBuilder builder){
+        try{
+            String plainPass = user.getPassword();
+            user.setPassword(encoder.encode(plainPass.subSequence(0, plainPass.length())));
+            User created = userService.createUser(user);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setLocation(builder.path("/users/{id}").buildAndExpand(created.getId()).toUri());
+            return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
+        }catch (UserExistException e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 }

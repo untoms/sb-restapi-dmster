@@ -21,7 +21,7 @@ public class User {
 
     @ApiModelProperty(notes = "Auto generated unique id", position = 1)
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ApiModelProperty(notes = "ini username", example = "springboot", position = 1)
@@ -51,14 +51,32 @@ public class User {
 //    @JsonIgnore
     private String ssn;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(
+            cascade = CascadeType.ALL,
+            mappedBy = "user")
     @JsonView(Views.Internal.class)
     private List<Order> orders;
 
     @Column(name = "ADDRESS")
     private String address;
 
+    @Column(name = "PASSWORD", length = 100, nullable = false)
+    private String password;
+
     public User() {
+    }
+
+    public User(String username, String firstName, String lastName, String email,
+                String role, String ssn, List<Order> orders, String address, String password) {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.role = role;
+        this.ssn = ssn;
+        this.orders=orders;
+        this.address=address;
+        this.password = password;
     }
 
     public Long getId() {
@@ -131,5 +149,13 @@ public class User {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
