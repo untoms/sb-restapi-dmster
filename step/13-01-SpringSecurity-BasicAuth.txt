@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------------------------
+Step-01 : Add spring security dependencty to pom.xml
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+---------------------------------------------------------------------------------------------
+Step-02 : Add spring security config
+  - create new class SecurityConfig
+@Configuration
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+                //HTTP Basic authentication
+                .httpBasic()
+                .and()
+                .authorizeRequests()
+                .antMatchers("/h2-console/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/users/**").hasAnyRole("USER","ADMIN")
+                .and()
+                .headers().frameOptions().disable()
+                .and()
+                .csrf().disable()
+                .formLogin().disable();
+    }
+
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.inMemoryAuthentication()
+                .withUser("user")
+                .password("{noop}password")
+                .roles("USER");
+    }
+}
+---------------------------------------------------------------------------------------------
+Step-02 : Test using postan

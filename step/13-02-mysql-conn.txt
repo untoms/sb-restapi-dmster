@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------------------------
+Step-01 : install mysql 5.7 and create new db
+---------------------------------------------------------------------------------------------
+Step-02 : add pom.xml dependency
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+---------------------------------------------------------------------------------------------
+Step-02 : change application.properties
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+#spring.h2.console.enabled=true
+
+## Spring  DATASOURCE (DataSourceAutoConfiguration & DataSourceProperties)
+
+spring.datasource.url = jdbc:mysql://localhost:3306/dbspringboot?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+spring.datasource.username = root
+spring.datasource.password = root
+
+## Hibernate  Properties
+# The  SQL dialect makes Hibernate generate better SQL  for the chosen database
+
+spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQL5Dialect
+
+
+# Hibernate ddl auto (create, create-drop, validate, update)
+spring.jpa.hibernate.ddl-auto = create-drop
+---------------------------------------------------------------------------------------------
+Step-03 : crete init db in Main class
+void createUser(UserRepository r){
+
+	for (int i = 1; i < 10; i++) {
+		User user=new User("user"+i, "Digi"+i, "Master"+i, "something@gmail.com"+i, "USER", "SSN00"+i, "New York", new ArrayList<>());
+		List<Order> orders = new ArrayList<>();
+		orders.add(new Order("Order001 - "+user.getFirstname(),user));
+		orders.add(new Order("Order002 - "+user.getFirstname(),user));
+		orders.add(new Order("Order003 - "+user.getFirstname(),user));
+
+		user.setOrders(orders);
+		r.save(user);
+	}
+
+}
+---------------------------------------------------------------------------------------------
+Step-03 : change entity
+  - add cascade = CascadeType.All in entity User field orders
+  - change generated value to @GeneratedValue(strategy=GenerationType.IDENTITY) in both entity class
+---------------------------------------------------------------------------------------------
+Step-04 : exec and test

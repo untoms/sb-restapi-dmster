@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------------------------
+Step-01 : add password field in User entity
+---------------------------------------------------------------------------------------------
+Step-02 : add pom.xml dependency
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+---------------------------------------------------------------------------------------------
+Step-02 : create packate security inside config packaage
+  - Create CustomUserDetails class
+  - Create CustomUserDetailsService
+---------------------------------------------------------------------------------------------
+Step-03 : modify securityconfig
+  - add UserDetailsService field
+  - create bean
+  - create DaoAuthenticationProvider
+  - override configure
+
+---------------------------------------------------------------------------------------------
+Step-03 : Modify main class
+  - add new PasswordEncoder field
+  - modify insert user
+---------------------------------------------------------------------------------------------
+Step-04 : exec and test
