@@ -17,6 +17,7 @@ public class Order {
     private String orderdescription;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     @JsonIgnore
     private User user;
 
